@@ -1,0 +1,49 @@
+me: Build and Upload Artifacts
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Create build artifacts
+      run: |
+        mkdir -p dist
+        echo "Hello World" > dist/file1.txt
+        echo "Another file" > dist/file2.log
+        zip -r artifacts.zip dist/
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-outputs
+        path: |
+          dist/
+          artifacts.zip
+        retention-days: 5
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: test-reports/*.xml
+
+  download-artifacts:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-outputs
+        path: downloaded-artifacts
+
+    - name: List downloaded files
+      run: ls -R downloaded-artifacts

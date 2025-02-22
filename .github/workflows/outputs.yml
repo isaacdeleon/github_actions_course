@@ -1,0 +1,40 @@
+me: Outputs Example
+
+on: [push]
+
+jobs:
+  calculate-outputs:
+    runs-on: ubuntu-latest
+    outputs:
+      job-output: ${{ steps.step2.outputs.result }}
+      combined-output: ${{ steps.step3.outputs.combined }}
+
+    steps:
+    - name: Step 1 - Set output (single value)
+      id: step1
+      run: |
+        echo "value=42" >> $GITHUB_OUTPUT
+
+    - name: Step 2 - Process output
+      id: step2
+      run: |
+        result=$((${{ steps.step1.outputs.value }} * 2))
+        echo "result=$result" >> $GITHUB_OUTPUT
+
+    - name: Step 3 - Multi-value output
+      id: step3
+      run: |
+        echo "combined=app-${{ steps.step2.outputs.result }}-v1" >> $GITHUB_OUTPUT
+
+  use-outputs:
+    runs-on: ubuntu-latest
+    needs: calculate-outputs
+    steps:
+    - name: Show job outputs
+      run: |
+        echo "Job output: ${{ needs.calculate-outputs.outputs.job-output }}"
+        echo "Combined output: ${{ needs.calculate-outputs.outputs.combined-output }}"
+
+    - name: Use previous step output
+      run: |
+        echo "Previous job's calculated value was ${{ needs.calculate-outputs.outputs.job-output }}"
