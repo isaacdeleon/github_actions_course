@@ -8,11 +8,11 @@ env:
   MONGODB_NAME: hga-demo
 jobs:
   test:
+    environment: testing
     env:
       MONGODB_ADDRESS: 127.0.0.1
       MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
       MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-    environment: testing
     runs-on: ubuntu-latest
     steps:
       - name: Output information
